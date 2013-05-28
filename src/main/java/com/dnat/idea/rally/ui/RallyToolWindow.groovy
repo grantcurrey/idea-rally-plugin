@@ -1,5 +1,6 @@
 package com.dnat.idea.rally.ui
 
+import com.dnat.idea.rally.connector.RallySession
 import com.dnat.idea.rally.ui.action.OpenPluginSettingsAction
 import com.dnat.idea.rally.ui.action.RefreshCurrentViewAction
 import com.dnat.idea.rally.ui.action.SelectViewAction
@@ -11,9 +12,11 @@ import com.intellij.openapi.wm.ToolWindowFactory
 
 class RallyToolWindow implements ToolWindowFactory {
 
-    private RallyPanel rallyPanel
+    RallyPanel rallyPanel
 
     void createToolWindowContent(Project project, ToolWindow toolWindow) {
+        RallySession.instance.initialise()
+
         rallyPanel = new RallyPanel()
 
         def component = toolWindow.getComponent()

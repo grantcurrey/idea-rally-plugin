@@ -1,6 +1,6 @@
 package com.dnat.idea.rally.ui.action
 
-import com.dnat.idea.rally.connector.Rally
+import com.dnat.idea.rally.connector.RallySession
 import com.dnat.idea.rally.ui.GuiUtil
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Presentation
@@ -41,22 +41,17 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
     }
 
     private JBList buildViewList() {
-
-        //todo get current iteration
-
-        JBList viewList = new JBList(["Iteration 1","Iteration 2","Iteration 3"])
+        JBList viewList = new JBList(RallySession.instance.futureIterations)
         viewList.cellRenderer = new SelectViewRenderer()
         return viewList
     }
 
     @Override
     public void update(AnActionEvent e) {
-       GuiUtil.runInSwingThread(new Runnable(){
-           void run() {
-               def iteration = Rally.INSTANCE.getCurrentIterationForProject(Rally.INSTANCE.defaultProject.objectId)
-               selectedViewLabel.setText(iteration.name)
-           }
-       })
+        GuiUtil.runInSwingThread({
+            def iteration = RallySession.instance.activeIteration
+            selectedViewLabel.setText(iteration.name)
+        })
     }
 
     @Override
@@ -72,14 +67,13 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
         @Override
         public void mouseClicked(MouseEvent e) {
             final JBList viewList = buildViewList()
-
             JBPopup popup = new PopupChooserBuilder(viewList)
                     .setMovable(false)
                     .setCancelKeyEnabled(true)
-                    .setItemChoosenCallback(new Runnable() {
-                public void run() {
-                    print "selecting the new view: ${viewList.selectedValue}"
-                }
+                    .setItemChoosenCallback({
+
+                print "selecting the new view: ${viewList.selectedValue.objectId}"
+
             })
                     .createPopup()
 
@@ -95,8 +89,8 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
 
     private class SelectViewRenderer extends ColoredListCellRenderer {
         @Override
-        protected void customizeCellRenderer(JList list, Object value, int index, boolean selected, boolean hasFocus) {
-            append(value as String)
+        protected void customizeCellRenderer(JList list, def value, int index, boolean selected, boolean hasFocus) {
+            append(value.name)
         }
     }
 }

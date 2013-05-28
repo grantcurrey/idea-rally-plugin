@@ -16,7 +16,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-public class RallyPanel extends JPanel {
+public class RallyPanel {
     private JPanel mainPanel;
     private SimpleTree rallyTree;
 
