@@ -1,5 +1,6 @@
 package com.dnat.idea.rally.ui.action
 
+import com.dnat.idea.rally.connector.Rally
 import com.dnat.idea.rally.ui.GuiUtil
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Presentation
@@ -28,7 +29,7 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
         BoxLayout layout = new BoxLayout(selectViewPanel, BoxLayout.X_AXIS)
         selectViewPanel.setLayout(layout)
         selectedViewLabel = new JLabel()
-        JLabel show = new JLabel("View:")
+        JLabel show = new JLabel("")
         show.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2))
         selectViewPanel.add(show)
         selectViewPanel.add(selectedViewLabel)
@@ -41,7 +42,7 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
 
     private JBList buildViewList() {
 
-        //todo: Call rally code here!
+        //todo get current iteration
 
         JBList viewList = new JBList(["Iteration 1","Iteration 2","Iteration 3"])
         viewList.cellRenderer = new SelectViewRenderer()
@@ -50,7 +51,12 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
 
     @Override
     public void update(AnActionEvent e) {
-        selectedViewLabel.setText("Current Iteration (xx)")
+       GuiUtil.runInSwingThread(new Runnable(){
+           void run() {
+               def iteration = Rally.INSTANCE.getCurrentIterationForProject(Rally.INSTANCE.defaultProject.objectId)
+               selectedViewLabel.setText(iteration.name)
+           }
+       })
     }
 
     @Override
@@ -87,7 +93,7 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
         }
     }
 
-    private class SelectViewRenderer extends ColoredListCellRenderer {        
+    private class SelectViewRenderer extends ColoredListCellRenderer {
         @Override
         protected void customizeCellRenderer(JList list, Object value, int index, boolean selected, boolean hasFocus) {
             append(value as String)

@@ -20,12 +20,12 @@ class GuiUtil {
     }
 
     public static Icon loadIcon(String iconFilename) {
-        return IconLoader.findIcon(ICON_FOLDER + iconFilename,GuiUtil.class)
+        return IconLoader.findIcon(ICON_FOLDER + iconFilename, GuiUtil.class)
     }
 
 
     public static Icon loadIcon(String parentPath, String iconFilename) {
-        return IconLoader.findIcon(parentPath + iconFilename,GuiUtil.class)
+        return IconLoader.findIcon(parentPath + iconFilename, GuiUtil.class)
     }
 
 
@@ -36,4 +36,13 @@ class GuiUtil {
     public static URL getIconResource(String iconFilename) {
         return GuiUtil.class.getResource(ICON_FOLDER + iconFilename)
     }
+
+    public static void runInSwingThread(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
+    }
 }
+

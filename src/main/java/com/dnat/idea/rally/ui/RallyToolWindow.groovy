@@ -1,6 +1,7 @@
 package com.dnat.idea.rally.ui
 
 import com.dnat.idea.rally.ui.action.OpenPluginSettingsAction
+import com.dnat.idea.rally.ui.action.RefreshCurrentViewAction
 import com.dnat.idea.rally.ui.action.SelectViewAction
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.Project
@@ -26,6 +27,7 @@ class RallyToolWindow implements ToolWindowFactory {
     private def createToolbar() {
         DefaultActionGroup actionGroup = new DefaultActionGroup("RallyToolbarGroup", false);
         actionGroup.add(new SelectViewAction())
+        actionGroup.add(new RefreshCurrentViewAction())
         actionGroup.addSeparator();
         actionGroup.add(new OpenPluginSettingsAction());
 
