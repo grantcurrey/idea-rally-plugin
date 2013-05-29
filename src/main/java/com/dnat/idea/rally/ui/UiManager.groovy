@@ -10,15 +10,14 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 
-class RallyToolWindow implements ToolWindowFactory {
-
+class UiManager implements ToolWindowFactory {
     RallyPanel rallyPanel
 
-    void createToolWindowContent(Project project, ToolWindow toolWindow) {
-        RallySession.instance.initialise()
-
+    public UiManager(){
         rallyPanel = new RallyPanel()
+    }
 
+    void createToolWindowContent(Project project, ToolWindow toolWindow) {
         def component = toolWindow.getComponent()
 
         def parent = new SimpleToolWindowPanel(true)
@@ -34,6 +33,6 @@ class RallyToolWindow implements ToolWindowFactory {
         actionGroup.addSeparator();
         actionGroup.add(new OpenPluginSettingsAction());
 
-       return actionGroup
+        return actionGroup
     }
 }

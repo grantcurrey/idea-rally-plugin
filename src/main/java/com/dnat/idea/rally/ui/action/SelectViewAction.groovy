@@ -50,7 +50,11 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
     public void update(AnActionEvent e) {
         GuiUtil.runInSwingThread({
             def iteration = RallySession.instance.activeIteration
-            selectedViewLabel.setText(iteration.name)
+            if(!iteration){
+                selectedViewLabel.setText("No rally connection!")
+            } else {
+                selectedViewLabel.setText(iteration.name)
+            }
         })
     }
 

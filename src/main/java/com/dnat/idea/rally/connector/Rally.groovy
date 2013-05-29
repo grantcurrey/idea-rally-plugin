@@ -8,18 +8,14 @@ import com.rallydev.rest.util.QueryFilter
 
 @Singleton
 class Rally {
-    def username = "grant.currey@wotifgroup.com"
-    def password = "Passw0rd"
-    def url = "https://rally.wotifgroup.com"
 
     RallyRestApi restApi
 
     def Rally() {
-        initialise()
     }
 
-    void initialise() {
-        restApi = new InsecureRallyRestApi(new URI(url), username, password)
+    void initialise(RallySettings rallySettings) {
+        restApi = new InsecureRallyRestApi(new URI(rallySettings.url), rallySettings.username, rallySettings.password)
         restApi.setWsapiVersion("1.40")
     }
 

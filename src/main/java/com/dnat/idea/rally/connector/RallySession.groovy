@@ -1,7 +1,12 @@
 package com.dnat.idea.rally.connector
 
+import org.apache.log4j.Logger
+
 @Singleton
 class RallySession {
+
+    private static final Logger LOG = Logger.getLogger(RallySession.class)
+
     def currentUser
     def currentProject
     def futureIterations
@@ -9,36 +14,55 @@ class RallySession {
 
     def selectedIteration
 
+    def offline = true
+
     def getCurrentUser(boolean refresh = false) {
-        if (refresh || currentUser == null) {
+        if (shouldRefresh(refresh, currentUser)) {
             currentUser = Rally.instance.userDetails
         }
         return currentUser
     }
 
     def getCurrentProject(boolean refresh = false) {
-        if (refresh || currentProject == null) {
+        if (shouldRefresh(refresh, currentProject)) {
             currentProject = Rally.instance.currentProject
         }
         return currentProject
     }
 
     def getFutureIterations(boolean refresh = false) {
-        if (refresh || futureIterations == null) {
+        if (shouldRefresh(refresh, futureIterations)) {
             futureIterations = Rally.instance.getFutureIterationsForProject(currentProject.objectId)
         }
         return futureIterations
     }
 
     def getActiveIteration(boolean refresh = false) {
-        if (refresh || activeIteration == null) {
+        if (shouldRefresh(refresh, activeIteration)) {
             activeIteration = Rally.instance.getCurrentIterationForProject(currentProject.objectId)
         }
         return activeIteration
     }
 
-    def initialise(){
-        getCurrentUser(true)
+    def shouldRefresh(def refresh, def object) {
+        return !offline && (refresh || !object)
+    }
+
+    def refresh(){
         getCurrentProject(true)
+        getActiveIteration(true)
+        getFutureIterations(true)
+    }
+
+    def initialise(RallySettings rallySettings) {
+        try {
+            Rally.instance.initialise(rallySettings)
+            getCurrentUser(true)
+            getCurrentProject(true)
+            offline = false
+        } catch (Exception e) {
+            LOG.error("Unable to connect to rally server", e)
+            offline = true
+        }
     }
 }

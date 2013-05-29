@@ -1,42 +1,33 @@
 <idea-plugin version="2">
     <id>com.dnat.rally</id>
     <name>Rally Plugin</name>
-    <version>1.0</version>
+    <version>1.1</version>
     <vendor email="grantc@dna-tech.net.au" url="http://www.secureprotect.com.au">DNA Technology</vendor>
 
     <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <small>most HTML tags may be used</small>
+      <p>This plugin brings <a href="https://www.rallydev.com/">Rally</a> iterations and projects into the ide.</p>
+      <p>The plugin supports:
+        <ul>
+            <li>Default project support</li>
+            <li>View current and future iterations</li>
+        </ul>
+      </p>
       ]]></description>
 
-    <change-notes><![CDATA[
-      Add change notes here.<br>
-      <small>most HTML tags may be used</small>
-      ]]>
-    </change-notes>
 
-    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="107.105"/>
 
-    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-         on how to target different products -->
-    <!-- uncomment to enable plugin in all products
     <depends>com.intellij.modules.lang</depends>
-    -->
-
-    <application-components>
-        <!-- Add your application components here -->
-    </application-components>
 
     <project-components>
-        <!-- Add your project components here -->
+        <component>
+            <implementation-class>com.dnat.idea.rally.RallyComponent</implementation-class>
+        </component>
     </project-components>
 
-    <actions>
-
-    </actions>
-
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Rally" anchor="right" factoryClass="com.dnat.idea.rally.ui.RallyToolWindow"/>
+        <projectService serviceInterface="com.dnat.idea.rally.connector.RallySettings" serviceImplementation="com.dnat.idea.rally.connector.RallySettings"/>
+
+        <toolWindow id="Rally" anchor="right" factoryClass="com.dnat.idea.rally.ui.UiManager"/>
     </extensions>
 </idea-plugin>
