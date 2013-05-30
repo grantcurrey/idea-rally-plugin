@@ -2,6 +2,8 @@ package com.dnat.idea.rally.ui.action
 
 import com.dnat.idea.rally.connector.RallySession
 import com.dnat.idea.rally.ui.GuiUtil
+import com.dnat.idea.rally.ui.RallyPanel
+import com.dnat.idea.rally.ui.background.LoadIteration
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction
@@ -17,14 +19,17 @@ import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
-public class SelectViewAction extends DumbAwareAction implements CustomComponentAction {
+public class SelectIterationAction extends DumbAwareAction implements CustomComponentAction {
 
     private static final Icon ARROWS_ICON = GuiUtil.loadIcon("/ide/", "statusbar_arrows.png")
 
-    protected final JLabel selectedViewLabel
-    protected final JPanel selectViewPanel
+    JLabel selectedViewLabel
+    JPanel selectViewPanel
+    RallyPanel rallyPanel
 
-    public SelectViewAction() {
+
+    public SelectIterationAction(RallyPanel rallyPanel) {
+        this.rallyPanel = rallyPanel
         selectViewPanel = new JPanel()
         BoxLayout layout = new BoxLayout(selectViewPanel, BoxLayout.X_AXIS)
         selectViewPanel.setLayout(layout)
@@ -49,7 +54,7 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
     @Override
     public void update(AnActionEvent e) {
         GuiUtil.runInSwingThread({
-            def iteration = RallySession.instance.activeIteration
+            def iteration = RallySession.instance.selectedIteration
             if(!iteration){
                 selectedViewLabel.setText("No rally connection!")
             } else {
@@ -75,9 +80,8 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
                     .setMovable(false)
                     .setCancelKeyEnabled(true)
                     .setItemChoosenCallback({
-
-                print "selecting the new view: ${viewList.selectedValue.objectId}"
-
+                RallySession.instance.selectIteration(viewList.selectedValue)
+                new LoadIteration(null,rallyPanel).queue()
             })
                     .createPopup()
 

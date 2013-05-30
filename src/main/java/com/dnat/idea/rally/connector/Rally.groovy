@@ -25,6 +25,7 @@ class Rally {
         String objectJson = response.object.toString()
 
         return [
+                type: "user",
                 firstName: JsonPath.read(objectJson, "\$.FirstName"),
                 lastName: JsonPath.read(objectJson, "\$.LastName"),
                 userName: JsonPath.read(objectJson, "\$.UserName"),
@@ -41,6 +42,7 @@ class Rally {
         String objectJson = restApi.get(new GetRequest("/project/${projectId}")).object.toString()
 
         return [
+                type: "project",
                 name: JsonPath.read(objectJson, "\$.Name"),
                 objectId: projectId
         ]
@@ -50,7 +52,7 @@ class Rally {
         QueryRequest request = new QueryRequest("Iteration")
         request.queryFilter = QueryFilter.and(
                 new QueryFilter("project", "=", "project/${projectId}"),
-                new QueryFilter("StartDate", ">", "today"),
+                new QueryFilter("EndDate", ">=", "today"),
                 QueryFilter.or(
                         new QueryFilter("state", "=", "Committed"),
                         new QueryFilter("state", "=", "Planning")
@@ -64,8 +66,28 @@ class Rally {
             response.results.each { result ->
                 def objectJson = result.toString()
                 results.add([
+                        type: "iteration",
                         name: JsonPath.read(objectJson, "\$.Name") as String,
                         objectId: JsonPath.read(objectJson, "\$.ObjectID") as Long,
+                ])
+            }
+        }
+        return results
+    }
+
+    def getStoriesForIteration(def iterationId) {
+        QueryRequest request = new QueryRequest("hierarchicalrequirement")
+        request.queryFilter = new QueryFilter("iteration", "=", "iteration/${iterationId}")
+        def response = restApi.query(request)
+        def results = []
+        if (response.totalResultCount > 0) {
+            response.results.each { result ->
+                def objectJson = result.toString()
+                results.add([
+                        type: "story",
+                        formattedId: JsonPath.read(objectJson, "\$.FormattedID") as String,
+                        name: JsonPath.read(objectJson, "\$.Name") as String,
+                        scheduleState: JsonPath.read(objectJson, "\$.ScheduleState") as String
                 ])
             }
         }
@@ -79,6 +101,7 @@ class Rally {
         def results = [:]
         if (response.totalResultCount > 0) {
             def objectJson = response.results.get(0).toString()
+            results.type = "iteration"
             results.name = JsonPath.read(objectJson, "\$.Name") as String
             results.objectId = JsonPath.read(objectJson, "\$.ObjectID") as Long
         }

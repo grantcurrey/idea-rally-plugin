@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.dnat.rally</id>
     <name>Rally Plugin</name>
-    <version>1.1</version>
+    <version>1.3</version>
     <vendor email="grantc@dna-tech.net.au" url="http://www.secureprotect.com.au">DNA Technology</vendor>
 
     <description><![CDATA[

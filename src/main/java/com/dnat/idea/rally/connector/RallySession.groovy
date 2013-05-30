@@ -44,11 +44,26 @@ class RallySession {
         return activeIteration
     }
 
-    def shouldRefresh(def refresh, def object) {
-        return !offline && (refresh || !object)
+    def getSelectedIteration(){
+        if(!selectedIteration){
+            selectedIteration = getActiveIteration()
+        }
+        return selectedIteration
     }
 
-    def refresh(){
+    def selectIteration(def selectedIteration) {
+        this.selectedIteration = selectedIteration
+    }
+
+    def getStoriesForSelectedIteration() {
+        return Rally.instance.getStoriesForIteration(selectedIteration.objectId)
+    }
+
+    def shouldRefresh(def refresh, def object) {
+        return (refresh || !object)
+    }
+
+    def refresh() {
         getCurrentProject(true)
         getActiveIteration(true)
         getFutureIterations(true)
@@ -56,7 +71,9 @@ class RallySession {
 
     def initialise(RallySettings rallySettings) {
         try {
-            Rally.instance.initialise(rallySettings)
+            if (rallySettings) {
+                Rally.instance.initialise(rallySettings)
+            }
             getCurrentUser(true)
             getCurrentProject(true)
             offline = false

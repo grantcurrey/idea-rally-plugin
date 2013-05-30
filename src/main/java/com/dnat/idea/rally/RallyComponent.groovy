@@ -1,18 +1,18 @@
 package com.dnat.idea.rally
 
-import com.dnat.idea.rally.connector.Rally
 import com.dnat.idea.rally.connector.RallySession
 import com.dnat.idea.rally.connector.RallySettings
 import com.dnat.idea.rally.ui.GuiUtil
 import com.dnat.idea.rally.ui.RallySettingsPanel
+import com.dnat.idea.rally.ui.background.InitializeRally
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.Project
 
-import javax.swing.JComponent
+import javax.swing.*
 
-class RallyComponent implements ProjectComponent, Configurable{
+class RallyComponent implements ProjectComponent, Configurable {
 
     Project project
 
@@ -20,16 +20,17 @@ class RallyComponent implements ProjectComponent, Configurable{
 
     RallySettingsPanel rallySettingsPanel
 
-    public RallyComponent(Project project){
+    public RallyComponent(Project project) {
         this.project = project
         this.rallySettings = RallySettings.getSafeInstance(this.project)
 
-        RallySession.instance.initialise(this.rallySettings)
+        new InitializeRally(project).queue()
+
         rallySettingsPanel = new RallySettingsPanel()
     }
 
     void projectOpened() {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     void projectClosed() {
@@ -49,31 +50,31 @@ class RallyComponent implements ProjectComponent, Configurable{
     }
 
     String getDisplayName() {
-          "Rally Settings"
-      }
+        "Rally Settings"
+    }
 
-      String getHelpTopic() {
-          return null
-      }
+    String getHelpTopic() {
+        return null
+    }
 
-      JComponent createComponent() {
-          return rallySettingsPanel.mainPanel
-      }
+    JComponent createComponent() {
+        return rallySettingsPanel.mainPanel
+    }
 
-      boolean isModified() {
-          return true
-      }
+    boolean isModified() {
+        return true
+    }
 
-      void apply() throws ConfigurationException {
-          rallySettingsPanel.applyConfigurationData(this.rallySettings)
-          GuiUtil.runInSwingThread({RallySession.instance.initialise(this.rallySettings)})
-      }
+    void apply() throws ConfigurationException {
+        rallySettingsPanel.applyConfigurationData(this.rallySettings)
+        GuiUtil.runInSwingThread({ RallySession.instance.initialise(this.rallySettings) })
+    }
 
-      void reset() {
-          rallySettingsPanel.loadConfigurationData(this.rallySettings)
-      }
+    void reset() {
+        rallySettingsPanel.loadConfigurationData(this.rallySettings)
+    }
 
-      void disposeUIResources() {
+    void disposeUIResources() {
 
-   }
+    }
 }
