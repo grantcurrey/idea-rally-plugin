@@ -22,8 +22,10 @@ class LoadIteration extends Task.Backgroundable {
         GuiUtil.runInSwingThread(new Runnable() {
             public void run() {
                 def selectedIteration = RallySession.getInstance(project).selectedIteration
-                def stories = RallySession.getInstance(project).getStoriesForSelectedIteration()
-                rallyPanel.selectIteration(selectedIteration, stories)
+                if (selectedIteration) {
+                    def stories = RallySession.getInstance(project).getStoriesForSelectedIteration()
+                    rallyPanel.selectIteration(selectedIteration, stories)
+                }
             }
         });
     }

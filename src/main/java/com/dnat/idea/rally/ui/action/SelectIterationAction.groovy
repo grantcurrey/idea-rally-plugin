@@ -1,6 +1,7 @@
 package com.dnat.idea.rally.ui.action
 
 import com.dnat.idea.rally.connector.RallySession
+import com.dnat.idea.rally.connector.entity.Iteration
 import com.dnat.idea.rally.ui.GuiUtil
 import com.dnat.idea.rally.ui.RallyPanel
 import com.dnat.idea.rally.ui.background.LoadIteration
@@ -56,11 +57,11 @@ public class SelectIterationAction extends DumbAwareAction implements CustomComp
     @Override
     public void update(AnActionEvent e) {
         GuiUtil.runInSwingThread({
-            def iteration = RallySession.getInstance(project).selectedIteration
+            Iteration iteration = RallySession.getInstance(project).selectedIteration
             if(!iteration){
                 selectedViewLabel.setText("Please select an iteration")
             } else {
-                selectedViewLabel.setText(iteration.name)
+                selectedViewLabel.setText(iteration.getName())
             }
         })
     }

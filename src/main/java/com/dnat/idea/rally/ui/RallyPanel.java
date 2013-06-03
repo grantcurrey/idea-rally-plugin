@@ -9,6 +9,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.dnat.idea.rally.ui;
 
+import com.dnat.idea.rally.connector.entity.Iteration;
+import com.dnat.idea.rally.connector.entity.Story;
 import com.dnat.idea.rally.ui.background.LoadIteration;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.ColoredTreeCellRenderer;
@@ -19,7 +21,6 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.util.List;
-import java.util.Map;
 
 public class RallyPanel {
     private JPanel mainPanel;
@@ -36,7 +37,7 @@ public class RallyPanel {
     private static final Icon D_INCOMPLETE = GuiUtil.loadIcon("d-incomplete.png");
     private static final Icon P_INCOMPLETE = GuiUtil.loadIcon("p-incomplete.png");
 
-    public RallyPanel(Project project){
+    public RallyPanel(Project project) {
         this.project = project;
     }
 
@@ -56,7 +57,7 @@ public class RallyPanel {
 
     }
 
-    public void selectIteration(Map iteration, List<Map> stories) {
+    public void selectIteration(Iteration iteration, List<Story> stories) {
         /*List<Job> jobList = jenkins.getJobs();
         if (jobList.isEmpty()) {
             return;
@@ -69,7 +70,7 @@ public class RallyPanel {
         model.nodeStructureChanged(rootNode);
         rallyTree.updateUI();
 
-        for (Map story : stories) {
+        for (Story story : stories) {
             DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(story);
             rootNode.add(jobNode);
         }
@@ -84,16 +85,16 @@ public class RallyPanel {
 
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 
-            Map data = (Map) node.getUserObject();
 
-            if (data != null) {
-
-                if (data.get("type") == "story") {
-                    append(data.get("formattedId") + "-" + data.get("name"));
-                    String state = (String) data.get("scheduleState");
+            if (node.getUserObject() != null) {
+                if (node.getUserObject() instanceof Story) {
+                    Story data = (Story) node.getUserObject();
+                    append(data.getFormattedId() + "-" + data.getName());
+                    String state = data.getScheduleState();
                     setIcon(new CompositeIcon(getIconState(state)));
-                } else if (data.get("type") == "iteration") {
-                    append((String) data.get("name"));
+                } else if (node.getUserObject() instanceof Iteration) {
+                    Iteration data = (Iteration) node.getUserObject();
+                    append(data.getName());
                 }
             }
         }

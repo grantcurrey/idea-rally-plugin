@@ -1,31 +1,33 @@
 package com.dnat.idea.rally.connector
 
+import com.dnat.idea.rally.connector.entity.Iteration
+import com.dnat.idea.rally.connector.entity.Project
+import com.dnat.idea.rally.connector.entity.User
 import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.project.Project
 import org.apache.log4j.Logger
 
 class RallySession {
 
     private static final Logger LOG = Logger.getLogger(RallySession.class)
 
-    public static RallySession getInstance(Project project) {
+    public static RallySession getInstance(com.intellij.openapi.project.Project project) {
         RallySession singleton = ServiceManager.getService(project, RallySession.class)
         return singleton != null ? singleton : new RallySession(project)
     }
 
-    def currentUser
-    def currentProject
-    def futureIterations
-    def activeIteration
+    User currentUser
+    Project currentProject
+    List<Iteration> futureIterations
+    Iteration activeIteration
 
-    def selectedIteration
+    Iteration selectedIteration
 
     def offline = true
 
-    Project project
+    com.intellij.openapi.project.Project project
     Rally rally
 
-    private RallySession(Project project) {
+    private RallySession(com.intellij.openapi.project.Project project) {
         this.project = project
         initialise()
     }
