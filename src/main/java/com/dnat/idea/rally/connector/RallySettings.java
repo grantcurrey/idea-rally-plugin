@@ -13,14 +13,14 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 )
 public class RallySettings implements PersistentStateComponent<RallySettings> {
 
+    public static RallySettings getInstance(Project project) {
+        RallySettings singleton = ServiceManager.getService(project, RallySettings.class);
+        return singleton != null ? singleton : new RallySettings();
+    }
+
     String username = "";
     String password = "";
     String url = "https://www.rallydev.com";
-
-    public static RallySettings getSafeInstance(Project project) {
-        RallySettings settings = ServiceManager.getService(project, RallySettings.class);
-        return settings != null ? settings : new RallySettings();
-    }
 
     public String getPassword() {
         return password;

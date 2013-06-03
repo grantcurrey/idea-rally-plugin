@@ -14,12 +14,10 @@ class UiManager implements ToolWindowFactory {
 
     Project project
 
-    public UiManager(){
-        this.rallyPanel = new RallyPanel()
-    }
-
     void createToolWindowContent(Project project, ToolWindow toolWindow) {
         this.project = project
+
+        this.rallyPanel = new RallyPanel(project)
 
         def parent = new SimpleToolWindowPanel(true)
         parent.add(rallyPanel.mainPanel)
@@ -29,7 +27,7 @@ class UiManager implements ToolWindowFactory {
 
     private def createToolbar() {
         DefaultActionGroup actionGroup = new DefaultActionGroup("RallyToolbarGroup", false);
-        actionGroup.add(new SelectIterationAction(rallyPanel))
+        actionGroup.add(new SelectIterationAction(rallyPanel, project))
         actionGroup.add(new RefreshCurrentViewAction())
         actionGroup.addSeparator();
         actionGroup.add(new OpenPluginSettingsAction());

@@ -1,20 +1,29 @@
 package com.dnat.idea.rally.connector
 
+import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.project.Project
 import com.jayway.jsonpath.JsonPath
 import com.rallydev.rest.RallyRestApi
 import com.rallydev.rest.request.GetRequest
 import com.rallydev.rest.request.QueryRequest
 import com.rallydev.rest.util.QueryFilter
 
-@Singleton
 class Rally {
 
     RallyRestApi restApi
+    RallySettings rallySettings
 
-    def Rally() {
+    public static Rally getInstance(Project project) {
+        Rally singleton = ServiceManager.getService(project, Rally.class)
+        return singleton != null ? singleton : new Rally(project)
     }
 
-    void initialise(RallySettings rallySettings) {
+    private Rally(Project project) {
+        this.rallySettings = RallySettings.getInstance(project)
+        initialise()
+    }
+
+    void initialise() {
         restApi = new InsecureRallyRestApi(new URI(rallySettings.url), rallySettings.username, rallySettings.password)
         restApi.setWsapiVersion("1.40")
     }
@@ -96,7 +105,7 @@ class Rally {
 
     def getCurrentIterationForProject(def projectId) {
         QueryRequest request = new QueryRequest("Iteration")
-        request.queryFilter = new QueryFilter("project", "=", "project/${projectId}").and(new QueryFilter("state", "=", "Committed"))
+        request.queryFilter = QueryFilter.and(new QueryFilter("project", "=", "project/${projectId}"),new QueryFilter("state", "=", "Committed"), new QueryFilter("EndDate", ">=", "today"))
         def response = restApi.query(request)
         def results = [:]
         if (response.totalResultCount > 0) {

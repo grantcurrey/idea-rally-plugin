@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Presentation
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.PopupChooserBuilder
 import com.intellij.ui.ColoredListCellRenderer
@@ -26,9 +27,10 @@ public class SelectIterationAction extends DumbAwareAction implements CustomComp
     JLabel selectedViewLabel
     JPanel selectViewPanel
     RallyPanel rallyPanel
+    Project project
 
-
-    public SelectIterationAction(RallyPanel rallyPanel) {
+    public SelectIterationAction(RallyPanel rallyPanel, Project project) {
+        this.project = project
         this.rallyPanel = rallyPanel
         selectViewPanel = new JPanel()
         BoxLayout layout = new BoxLayout(selectViewPanel, BoxLayout.X_AXIS)
@@ -46,7 +48,7 @@ public class SelectIterationAction extends DumbAwareAction implements CustomComp
     }
 
     private JBList buildViewList() {
-        JBList viewList = new JBList(RallySession.instance.futureIterations)
+        JBList viewList = new JBList(RallySession.getInstance(project).futureIterations)
         viewList.cellRenderer = new SelectViewRenderer()
         return viewList
     }
@@ -54,9 +56,9 @@ public class SelectIterationAction extends DumbAwareAction implements CustomComp
     @Override
     public void update(AnActionEvent e) {
         GuiUtil.runInSwingThread({
-            def iteration = RallySession.instance.selectedIteration
+            def iteration = RallySession.getInstance(project).selectedIteration
             if(!iteration){
-                selectedViewLabel.setText("No rally connection!")
+                selectedViewLabel.setText("Please select an iteration")
             } else {
                 selectedViewLabel.setText(iteration.name)
             }
@@ -80,8 +82,8 @@ public class SelectIterationAction extends DumbAwareAction implements CustomComp
                     .setMovable(false)
                     .setCancelKeyEnabled(true)
                     .setItemChoosenCallback({
-                RallySession.instance.selectIteration(viewList.selectedValue)
-                new LoadIteration(null,rallyPanel).queue()
+                RallySession.getInstance(project).selectIteration(viewList.selectedValue)
+                new LoadIteration(project,rallyPanel).queue()
             })
                     .createPopup()
 

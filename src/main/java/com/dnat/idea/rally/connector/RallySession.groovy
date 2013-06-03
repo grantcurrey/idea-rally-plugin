@@ -1,11 +1,17 @@
 package com.dnat.idea.rally.connector
 
+import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.project.Project
 import org.apache.log4j.Logger
 
-@Singleton
 class RallySession {
 
     private static final Logger LOG = Logger.getLogger(RallySession.class)
+
+    public static RallySession getInstance(Project project) {
+        RallySession singleton = ServiceManager.getService(project, RallySession.class)
+        return singleton != null ? singleton : new RallySession(project)
+    }
 
     def currentUser
     def currentProject
@@ -16,36 +22,44 @@ class RallySession {
 
     def offline = true
 
+    Project project
+    Rally rally
+
+    private RallySession(Project project) {
+        this.project = project
+        initialise()
+    }
+
     def getCurrentUser(boolean refresh = false) {
         if (shouldRefresh(refresh, currentUser)) {
-            currentUser = Rally.instance.userDetails
+            currentUser = rally.userDetails
         }
         return currentUser
     }
 
     def getCurrentProject(boolean refresh = false) {
         if (shouldRefresh(refresh, currentProject)) {
-            currentProject = Rally.instance.currentProject
+            currentProject = rally.currentProject
         }
         return currentProject
     }
 
     def getFutureIterations(boolean refresh = false) {
         if (shouldRefresh(refresh, futureIterations)) {
-            futureIterations = Rally.instance.getFutureIterationsForProject(currentProject.objectId)
+            futureIterations = rally.getFutureIterationsForProject(currentProject.objectId)
         }
         return futureIterations
     }
 
     def getActiveIteration(boolean refresh = false) {
         if (shouldRefresh(refresh, activeIteration)) {
-            activeIteration = Rally.instance.getCurrentIterationForProject(currentProject.objectId)
+            activeIteration = rally.getCurrentIterationForProject(currentProject.objectId)
         }
         return activeIteration
     }
 
-    def getSelectedIteration(){
-        if(!selectedIteration){
+    def getSelectedIteration() {
+        if (!selectedIteration) {
             selectedIteration = getActiveIteration()
         }
         return selectedIteration
@@ -56,7 +70,7 @@ class RallySession {
     }
 
     def getStoriesForSelectedIteration() {
-        return Rally.instance.getStoriesForIteration(selectedIteration.objectId)
+        return rally.getStoriesForIteration(selectedIteration.objectId)
     }
 
     def shouldRefresh(def refresh, def object) {
@@ -69,11 +83,10 @@ class RallySession {
         getFutureIterations(true)
     }
 
-    def initialise(RallySettings rallySettings) {
+    def initialise() {
         try {
-            if (rallySettings) {
-                Rally.instance.initialise(rallySettings)
-            }
+            this.rally = Rally.getInstance(project)
+            this.rally.initialise()
             getCurrentUser(true)
             getCurrentProject(true)
             offline = false

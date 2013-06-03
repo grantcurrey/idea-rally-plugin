@@ -22,9 +22,16 @@ class RallyComponent implements ProjectComponent, Configurable {
 
     public RallyComponent(Project project) {
         this.project = project
-        this.rallySettings = RallySettings.getSafeInstance(this.project)
+        this.rallySettings = RallySettings.getInstance(this.project)
+        RallySession.getInstance(this.project)
 
-        new InitializeRally(project).queue()
+
+        /*def job = new InitializeRally(this.project)
+        try {
+            job.queue()
+        } catch (Throwable e) {
+            e.printStackTrace()
+        }*/
 
         rallySettingsPanel = new RallySettingsPanel()
     }
@@ -67,7 +74,7 @@ class RallyComponent implements ProjectComponent, Configurable {
 
     void apply() throws ConfigurationException {
         rallySettingsPanel.applyConfigurationData(this.rallySettings)
-        GuiUtil.runInSwingThread({ RallySession.instance.initialise(this.rallySettings) })
+        GuiUtil.runInSwingThread({ RallySession.getInstance(project).initialise() })
     }
 
     void reset() {

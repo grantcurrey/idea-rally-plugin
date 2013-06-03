@@ -14,8 +14,7 @@ class RefreshCurrentViewAction extends AnAction implements DumbAware {
     @Override
     public void actionPerformed(AnActionEvent event) {
         GuiUtil.runInSwingThread({
-            RallySession.instance.refresh()
-
+            RallySession.getInstance(event.getProject()).refresh()
         })
     }
 }

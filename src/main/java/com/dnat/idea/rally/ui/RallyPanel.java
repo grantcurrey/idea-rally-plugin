@@ -10,6 +10,7 @@
 package com.dnat.idea.rally.ui;
 
 import com.dnat.idea.rally.ui.background.LoadIteration;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.RowIcon;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class RallyPanel {
     private JPanel mainPanel;
     private SimpleTree rallyTree;
+    private Project project;
 
     private static final Icon A_COMPLETE = GuiUtil.loadIcon("a-complete.png");
     private static final Icon C_COMPLETE = GuiUtil.loadIcon("c-complete.png");
@@ -34,6 +36,9 @@ public class RallyPanel {
     private static final Icon D_INCOMPLETE = GuiUtil.loadIcon("d-incomplete.png");
     private static final Icon P_INCOMPLETE = GuiUtil.loadIcon("p-incomplete.png");
 
+    public RallyPanel(Project project){
+        this.project = project;
+    }
 
     public JPanel getMainPanel() {
         return mainPanel;
@@ -47,7 +52,7 @@ public class RallyPanel {
         rallyTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
 
 
-        new LoadIteration(null, this).queue();
+        new LoadIteration(project, this).queue();
 
     }
 

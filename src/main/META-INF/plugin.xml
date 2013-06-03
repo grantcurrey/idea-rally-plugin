@@ -27,6 +27,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceInterface="com.dnat.idea.rally.connector.RallySettings" serviceImplementation="com.dnat.idea.rally.connector.RallySettings"/>
+        <projectService serviceInterface="com.dnat.idea.rally.connector.RallySession" serviceImplementation="com.dnat.idea.rally.connector.RallySession"/>
+        <projectService serviceInterface="com.dnat.idea.rally.connector.Rally" serviceImplementation="com.dnat.idea.rally.connector.Rally"/>
 
         <toolWindow id="Rally" anchor="right" factoryClass="com.dnat.idea.rally.ui.UiManager"/>
     </extensions>

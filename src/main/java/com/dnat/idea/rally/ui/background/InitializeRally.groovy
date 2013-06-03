@@ -1,7 +1,6 @@
 package com.dnat.idea.rally.ui.background
 
 import com.dnat.idea.rally.connector.RallySession
-import com.dnat.idea.rally.connector.RallySettings
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
@@ -14,6 +13,7 @@ class InitializeRally extends Task.Backgroundable {
     }
 
     public void run(@NotNull ProgressIndicator progressIndicator) {
-        RallySession.instance.initialise(RallySettings.getSafeInstance(getProject()))
+        def project = getProject()
+        RallySession.getInstance(project)
     }
 }
