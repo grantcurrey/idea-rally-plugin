@@ -2,6 +2,7 @@ package com.dnat.idea.rally.connector
 
 import com.dnat.idea.rally.connector.entity.Iteration
 import com.dnat.idea.rally.connector.entity.Story
+import com.dnat.idea.rally.connector.entity.Task
 import com.dnat.idea.rally.connector.entity.User
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
@@ -10,24 +11,23 @@ import com.rallydev.rest.RallyRestApi
 import com.rallydev.rest.request.GetRequest
 import com.rallydev.rest.request.QueryRequest
 import com.rallydev.rest.util.QueryFilter
+import net.minidev.json.JSONObject
 
 class Rally {
 
     RallyRestApi restApi
-    RallySettings rallySettings
 
     public static Rally getInstance(Project project) {
         Rally singleton = ServiceManager.getService(project, Rally.class)
-        return singleton != null ? singleton : new Rally(project)
+        return singleton != null ? singleton : new Rally(RallySettings.getInstance(project))
     }
 
-    private Rally(Project project) {
-        this.rallySettings = RallySettings.getInstance(project)
-        initialise()
+    public Rally(RallySettings rallySettings) {
+        this(rallySettings.url, rallySettings.username, rallySettings.password)
     }
 
-    void initialise() {
-        restApi = new InsecureRallyRestApi(new URI(rallySettings.url), rallySettings.username, rallySettings.password)
+    public Rally(String url, String username, String password) {
+        restApi = new InsecureRallyRestApi(new URI(url), username, password)
         restApi.setWsapiVersion("1.40")
     }
 
@@ -97,13 +97,20 @@ class Rally {
         if (response.totalResultCount > 0) {
             response.results.each { result ->
                 def objectJson = result.toString()
-                results.add(new Story(
+
+                def story = new Story(
                         ref: JsonPath.read(objectJson, "\$._ref"),
                         objectId: JsonPath.read(objectJson, "\$.ObjectID") as Long,
                         formattedId: JsonPath.read(objectJson, "\$.FormattedID") as String,
                         name: JsonPath.read(objectJson, "\$.Name") as String,
                         scheduleState: JsonPath.read(objectJson, "\$.ScheduleState") as String
-                ))
+                )
+
+                JsonPath.read(objectJson, "\$.Tasks").each { JSONObject task ->
+                    story.tasks.add(new Task(name: task._refObjectName, ref: task._ref, objectId: ((task._ref =~ /.*\/([0-9]*)\.js/)[0][1]) as Long))
+                }
+
+                results.add(story)
             }
         }
         return results
@@ -111,7 +118,14 @@ class Rally {
 
     def getCurrentIterationForProject(def projectId) {
         QueryRequest request = new QueryRequest("Iteration")
-        request.queryFilter = QueryFilter.and(new QueryFilter("project", "=", "project/${projectId}"), new QueryFilter("state", "=", "Committed"), new QueryFilter("EndDate", ">=", "today"))
+        request.queryFilter =
+            QueryFilter.and(
+                    new QueryFilter("project", "=", "project/${projectId}"),
+                    QueryFilter.or(
+                            QueryFilter.and(new QueryFilter("state", "=", "Committed"), new QueryFilter("EndDate", ">=", "today")),
+                            QueryFilter.and(new QueryFilter("state", "=", "Planning"), new QueryFilter("StartDate", "<=", "today"), new QueryFilter("EndDate", ">=", "today"))
+                    )
+            )
         def response = restApi.query(request)
         def results = null
         if (response.totalResultCount > 0) {

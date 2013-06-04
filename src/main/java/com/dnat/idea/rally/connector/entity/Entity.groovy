@@ -17,6 +17,11 @@ class Story extends RallyEntity{
     String name
     String formattedId
     String scheduleState
+    List<Task> tasks = []
+}
+
+class Task extends RallyEntity{
+    String name
 }
 
 class Iteration extends RallyEntity{

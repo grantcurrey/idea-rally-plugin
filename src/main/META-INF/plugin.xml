@@ -17,6 +17,7 @@
 
     <idea-version since-build="107.105"/>
 
+    <depends>com.intellij.tasks</depends>
     <depends>com.intellij.modules.lang</depends>
 
     <project-components>
@@ -31,5 +32,7 @@
         <projectService serviceInterface="com.dnat.idea.rally.connector.Rally" serviceImplementation="com.dnat.idea.rally.connector.Rally"/>
 
         <toolWindow id="Rally" anchor="right" factoryClass="com.dnat.idea.rally.ui.UiManager"/>
+
+        <tasks.repositoryType implementation="com.dnat.idea.rally.tasks.RallyRepositoryType"/>
     </extensions>
 </idea-plugin>

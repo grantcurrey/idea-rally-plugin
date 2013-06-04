@@ -11,6 +11,7 @@ package com.dnat.idea.rally.ui;
 
 import com.dnat.idea.rally.connector.entity.Iteration;
 import com.dnat.idea.rally.connector.entity.Story;
+import com.dnat.idea.rally.connector.entity.Task;
 import com.dnat.idea.rally.ui.background.LoadIteration;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.ColoredTreeCellRenderer;
@@ -71,8 +72,15 @@ public class RallyPanel {
         rallyTree.updateUI();
 
         for (Story story : stories) {
-            DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(story);
-            rootNode.add(jobNode);
+            DefaultMutableTreeNode storyNode = new DefaultMutableTreeNode(story);
+            rootNode.add(storyNode);
+
+            if (story.getTasks().size() > 0) {
+                for (Task task : story.getTasks()) {
+                    DefaultMutableTreeNode taskNode = new DefaultMutableTreeNode(task);
+                    storyNode.add(taskNode);
+                }
+            }
         }
 
         rootNode.setUserObject(iteration);
@@ -82,19 +90,20 @@ public class RallyPanel {
     private class RallyTreeRenderer extends ColoredTreeCellRenderer {
         @Override
         public void customizeCellRenderer(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-
 
             if (node.getUserObject() != null) {
                 if (node.getUserObject() instanceof Story) {
-                    Story data = (Story) node.getUserObject();
-                    append(data.getFormattedId() + "-" + data.getName());
-                    String state = data.getScheduleState();
+                    Story story = (Story) node.getUserObject();
+                    append(story.getFormattedId() + "-" + story.getName());
+                    String state = story.getScheduleState();
                     setIcon(new CompositeIcon(getIconState(state)));
                 } else if (node.getUserObject() instanceof Iteration) {
-                    Iteration data = (Iteration) node.getUserObject();
-                    append(data.getName());
+                    Iteration iteration = (Iteration) node.getUserObject();
+                    append(iteration.getName());
+                } else if (node.getUserObject() instanceof Task){
+                    Task task = (Task) node.getUserObject();
+                    append(task.getName());
                 }
             }
         }

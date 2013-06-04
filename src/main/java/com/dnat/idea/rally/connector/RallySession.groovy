@@ -88,7 +88,6 @@ class RallySession {
     def initialise() {
         try {
             this.rally = Rally.getInstance(project)
-            this.rally.initialise()
             getCurrentUser(true)
             getCurrentProject(true)
             offline = false
