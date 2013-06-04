@@ -7,6 +7,8 @@ Currently it supports:
 
 * Selecting current or future iterations associated with your default project
 * Viewing the stories / defects associated with the selected iteration.
+* Viewing the rally task associated with a user story
+* Integration with the IntelliJ task system (Treats rally stories and defects and IntelliJ tasks)
 
 Still under development with the following features planned:
 
